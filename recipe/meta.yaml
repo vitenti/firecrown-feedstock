@@ -36,7 +36,7 @@ requirements:
     - matplotlib-base
     - more-itertools
     - numcosmo >=0.21.1
-    - numpy >=2.0
+    - numpy >=2.0,<2.4
     - portalocker
     - pybobyqa
     - pyccl >=2.8.0
