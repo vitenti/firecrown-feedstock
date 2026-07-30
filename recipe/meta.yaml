@@ -1,4 +1,4 @@
-{% set version = "1.15.1" %}
+{% set version = "1.15.2" %}
 
 package:
   name: firecrown
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/LSSTDESC/firecrown/releases/download/v{{ version }}/firecrown-{{ version }}.tar.gz
-  sha256: a1e121f7c20077411fad397c72f8861da02369f2662c78874388728c84b37176
+  sha256: e43c03927da36610e57f97a256244df3d18aeff021682c1b162b5d24eab6f1aa
 
 build:
   skip: true  # [win or py<311]
@@ -36,7 +36,7 @@ requirements:
     - matplotlib-base
     - more-itertools
     - numcosmo >=0.21.1
-    - numpy >=2.0
+    - numpy >=2.0,<2.4
     - portalocker
     - pybobyqa
     - pyccl >=2.8.0
