@@ -28,7 +28,7 @@ package:
 
 source:
   url: https://github.com/LSSTDESC/firecrown/releases/download/v{{ version }}/firecrown-{{ version }}.tar.gz
-  sha256: 48aac2d579b86976e3b47bd8fefdda68adb782ebf1e0586675428f7425ea9ced
+  sha256: cd5e26c4a60187c4333850f5c11beb7877c0f399325da898f7ee493ce2f3a9ee
 
 build:
   number: 0
