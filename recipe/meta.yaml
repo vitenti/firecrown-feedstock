@@ -37,7 +37,7 @@ build:
 outputs:
   - name: firecrown
     build:
-      script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+      script: build.sh
     requirements:
       build:
         - python                                 # [build_platform != target_platform]
