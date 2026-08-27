@@ -34,10 +34,25 @@ build:
   number: 0
   skip: true  # [win or py<312]
 
+# Every output declares its own requirements, but conda-smithy derives the CI
+# matrix from the top-level metadata: without python here, the rerender
+# collapses .ci_support to a single python version.
+requirements:
+  build:
+    - python                                 # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+  host:
+    - python
+
 outputs:
   - name: firecrown
     build:
-      script: build.sh
+      # $PYTHON is the shell variable conda-build exports into this output's
+      # build environment, not the {{ PYTHON }} jinja variable, which is not
+      # defined for every rendering pass of a split recipe.  Keeping it inline
+      # avoids a build.sh, which conda-build would adopt as the top-level
+      # script and run for every output that names none of its own.
+      script: $PYTHON -m pip install . -vv --no-deps --no-build-isolation
     requirements:
       build:
         - python                                 # [build_platform != target_platform]
