@@ -1,4 +1,4 @@
-{% set version = "1.15.2" %}
+{% set version = "1.16.0" %}
 
 # The requirement lists between BEGIN/END GENERATED markers are written from
 # the dependencies.yaml manifest in the firecrown repository:
@@ -28,7 +28,7 @@ package:
 
 source:
   url: https://github.com/LSSTDESC/firecrown/releases/download/v{{ version }}/firecrown-{{ version }}.tar.gz
-  sha256: e43c03927da36610e57f97a256244df3d18aeff021682c1b162b5d24eab6f1aa
+  sha256: 48aac2d579b86976e3b47bd8fefdda68adb782ebf1e0586675428f7425ea9ced
 
 build:
   number: 0
@@ -76,7 +76,7 @@ outputs:
       host:
         - python
       run:
-        # BEGIN GENERATED firecrown-deps (firecrown 1.15.0a1.dev216)
+        # BEGIN GENERATED firecrown-deps (firecrown 1.16.0)
         - python >=3.12
         - astropy  # examples/cluster_number_counts
         - camb <2.0
@@ -120,7 +120,7 @@ outputs:
         - .github/scripts/sync_deps.py
       commands:
         - python .github/scripts/sync_deps.py --check-installed firecrown-deps
-        # BEGIN GENERATED firecrown-deps-imports (firecrown 1.15.0a1.dev216)
+        # BEGIN GENERATED firecrown-deps-imports (firecrown 1.16.0)
         - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
         # END GENERATED firecrown-deps-imports
     about:
@@ -137,7 +137,7 @@ outputs:
       # narrow what firecrown-deps already installs, so they are expressed as
       # constraints rather than as dependencies.
       run_constrained:
-        # BEGIN GENERATED firecrown-deps-validated (firecrown 1.15.0a1.dev216)
+        # BEGIN GENERATED firecrown-deps-validated (firecrown 1.16.0)
         - astropy >=8.0.1,<8.1
         - camb >=1.6.5,<1.7
         - charset-normalizer >=3.5.1,<3.6
@@ -180,7 +180,7 @@ outputs:
         - .github/scripts/sync_deps.py
       commands:
         - python .github/scripts/sync_deps.py --check-installed firecrown-deps-validated
-        # BEGIN GENERATED firecrown-deps-imports (firecrown 1.15.0a1.dev216)
+        # BEGIN GENERATED firecrown-deps-imports (firecrown 1.16.0)
         - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
         # END GENERATED firecrown-deps-imports
     about:
@@ -209,7 +209,7 @@ outputs:
         - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
       # cobaya and isitgr are not packaged on conda-forge; install them with
       # pip, or use the environment.yml shipped with firecrown, which does.
-        # BEGIN GENERATED firecrown-devenv (firecrown 1.15.0a1.dev216)
+        # BEGIN GENERATED firecrown-devenv (firecrown 1.16.0)
         - alabaster
         - babel
         - beautifulsoup4
