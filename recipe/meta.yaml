@@ -1,7 +1,29 @@
 {% set version = "1.15.2" %}
 
+# The requirement lists between BEGIN/END GENERATED markers are written from
+# the dependencies.yaml manifest in the firecrown repository:
+#
+#     make feedstock-sync FEEDSTOCK=<path to this checkout>
+#
+# Edit the manifest, not the generated lines.
+#
+# Outputs
+# -------
+# firecrown                the package; depends only on firecrown-deps
+# firecrown-deps           what firecrown imports, with truthful bounds
+# firecrown-deps-validated the narrower ranges this release was validated
+#                          against, generated from firecrown's conda lockfiles
+# firecrown-validated      firecrown together with firecrown-deps-validated
+# firecrown-devenv         the developer environment
+#
+# When a new upstream release breaks an already published firecrown, tighten
+# the bound in the manifest, bump `build.number` below and regenerate.  Because
+# firecrown depends on firecrown-deps by version rather than by build string,
+# an existing firecrown installation picks up the corrected metapackage without
+# a new firecrown release and without a repodata patch.
+
 package:
-  name: firecrown
+  name: firecrown-split
   version: {{ version }}
 
 source:
@@ -9,54 +31,202 @@ source:
   sha256: e43c03927da36610e57f97a256244df3d18aeff021682c1b162b5d24eab6f1aa
 
 build:
-  skip: true  # [win or py<311]
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true  # [win or py<312]
 
-requirements:
-  build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-  host:
-    - python
-    - pip
-    - setuptools
-    - setuptools-scm
-  run:
-    - charset-normalizer
-    - clmm
-    - cosmosis >=3.0.0
-    - cosmosis-build-standard-library
-    - cython
-    - dill
-    - fitsio
-    - fuzzywuzzy
-    - getdist
-    - idna
-    - matplotlib-base
-    - more-itertools
-    - numcosmo >=0.21.1
-    - numpy >=2.0,<2.4
-    - portalocker
-    - pybobyqa
-    - pyccl >=2.8.0
-    - pydantic
-    - python
-    - pyyaml
-    - requests
-    - rich
-    - sacc >=2.1
-    - scipy >=1.12
-    - tabulate
-    - typer
-    - types-pyyaml
-    - urllib3
+outputs:
+  - name: firecrown
+    build:
+      script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    requirements:
+      build:
+        - python                                 # [build_platform != target_platform]
+        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+      host:
+        - python
+        - pip
+        - setuptools
+        - setuptools-scm
+      run:
+        - python
+        - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
+    test:
+      imports:
+        - firecrown
+      commands:
+        - python -c "import firecrown, importlib.metadata as md; assert firecrown.__version__ == '{{ version }}'; assert md.version('firecrown') == '{{ version }}'"
 
-test:
-  imports:
-    - firecrown
-  commands:
-    - python -c "import firecrown, importlib.metadata as md; assert firecrown.__version__ == '{{ version }}'; assert md.version('firecrown') == '{{ version }}'"
+  - name: firecrown-deps
+    requirements:
+      host:
+        - python
+      run:
+        # BEGIN GENERATED firecrown-deps (firecrown 1.15.0a1.dev216)
+        - python >=3.12
+        - astropy  # examples/cluster_number_counts
+        - camb <2.0
+        - charset-normalizer
+        - clmm  # part of the DESC stack; needed indirectly through lsstdesc-crow
+        - compilers  # two-phase cosmosis-standard-library installation
+        - cosmosis >=3.0
+        - cosmosis-build-standard-library
+        - cython
+        - dill
+        - fitsio
+        - fuzzywuzzy
+        - getdist
+        - idna
+        - lsstdesc-crow
+        - matplotlib-base  # firecrown sacc view
+        - more-itertools
+        - numcosmo >=0.27
+        - numpy >=2.0,<2.4
+        - pip >=20.1  # installs cobaya, which conda-forge does not package
+        - portalocker
+        - pybobyqa
+        - pyccl >=2.8.0
+        - pydantic
+        - pyyaml
+        - rich
+        - sacc >=2.4
+        - scipy >=1.13
+        - tabulate
+        - typer
+        - types-pyyaml
+        - typing_extensions
+        - urllib3
+        # END GENERATED firecrown-deps
+    test:
+      # A recipe left behind by a version bump would otherwise build
+      # green with the previous release's dependencies.
+      source_files:
+        - dependencies.yaml
+        - dependencies-validated.yaml
+        - .github/scripts/sync_deps.py
+      commands:
+        - python .github/scripts/sync_deps.py --check-installed firecrown-deps
+        # BEGIN GENERATED firecrown-deps-imports (firecrown 1.15.0a1.dev216)
+        - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
+        # END GENERATED firecrown-deps-imports
+    about:
+      summary: Runtime dependencies of firecrown
+
+  - name: firecrown-deps-validated
+    requirements:
+      host:
+        - python
+      run:
+        - python
+        - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
+      # The bounds firecrown {{ version }} was validated against.  They only
+      # narrow what firecrown-deps already installs, so they are expressed as
+      # constraints rather than as dependencies.
+      run_constrained:
+        # BEGIN GENERATED firecrown-deps-validated (firecrown 1.15.0a1.dev216)
+        - astropy >=8.0.1,<8.1
+        - camb >=1.6.5,<1.7
+        - charset-normalizer >=3.5.1,<3.6
+        - clmm >=1.16.10,<1.17
+        - compilers >=1.11.0,<1.12
+        - cosmosis >=3.25.2,<3.26
+        - cosmosis-build-standard-library >=1.3,<1.4
+        - cython >=3.3.0,<3.4
+        - dill >=0.4.1,<0.5
+        - fitsio >=1.4.2,<1.5
+        - fuzzywuzzy >=0.18.0,<0.19
+        - getdist >=1.7.7,<1.8
+        - idna >=3.19,<3.20
+        - lsstdesc-crow >=1.0.12,<1.1
+        - matplotlib-base >=3.11.1,<3.12
+        - more-itertools >=11.1.0,<11.2
+        - numcosmo >=0.27.0,<0.28
+        - numpy >=2.3.5,<2.4
+        - pip >=26.2.1,<26.3
+        - portalocker >=3.2.0,<3.3
+        - pybobyqa >=1.5.0,<1.6
+        - pyccl >=3.3.6,<3.4
+        - pydantic >=2.13.4,<2.14
+        - pyyaml >=6.0.3,<6.1
+        - rich >=15.0.0,<15.1
+        - sacc >=2.4,<2.5
+        - scipy >=1.18.0,<1.19
+        - tabulate >=0.10.0,<0.11
+        - typer >=0.27.1,<0.28
+        - types-pyyaml >=6.0.12.20260815,<6.1
+        - typing_extensions >=4.16.0,<4.17
+        - urllib3 >=2.7.0,<2.8
+        # END GENERATED firecrown-deps-validated
+    test:
+      # A recipe left behind by a version bump would otherwise build
+      # green with the previous release's dependencies.
+      source_files:
+        - dependencies.yaml
+        - dependencies-validated.yaml
+        - .github/scripts/sync_deps.py
+      commands:
+        - python .github/scripts/sync_deps.py --check-installed firecrown-deps-validated
+        # BEGIN GENERATED firecrown-deps-imports (firecrown 1.15.0a1.dev216)
+        - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
+        # END GENERATED firecrown-deps-imports
+    about:
+      summary: Runtime dependencies of firecrown, restricted to validated versions
+
+  - name: firecrown-validated
+    requirements:
+      host:
+        - python
+      run:
+        - python
+        - {{ pin_subpackage('firecrown', max_pin='x.x.x') }}
+        - {{ pin_subpackage('firecrown-deps-validated', max_pin='x.x.x') }}
+    test:
+      imports:
+        - firecrown
+    about:
+      summary: firecrown, restricted to the dependency versions it was validated against
+
+  - name: firecrown-devenv
+    requirements:
+      host:
+        - python
+      run:
+        - python
+        - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
+      # cobaya and isitgr are not packaged on conda-forge; install them with
+      # pip, or use the environment.yml shipped with firecrown, which does.
+        # BEGIN GENERATED firecrown-devenv (firecrown 1.15.0a1.dev216)
+        - alabaster
+        - babel
+        - beautifulsoup4
+        - black
+        - coverage
+        - deno
+        - flake8
+        - flake8-docstrings
+        - glib
+        - graphviz
+        - hypothesis
+        - jupyter
+        - linkchecker
+        - mypy
+        - pandas
+        - plotnine
+        - pylint
+        - pytest
+        - pytest-cov
+        - pytest-json-report
+        - pytest-xdist
+        - quarto
+        - requests
+        - sphinx
+        - sphinx-autoapi
+        - sphinx-autodoc-typehints
+        - sphinx-rtd-theme
+        - sphinxcontrib-apidoc
+        - types-requests
+        # END GENERATED firecrown-devenv
+    about:
+      summary: Everything needed to develop, test and document firecrown
 
 about:
   home: https://github.com/LSSTDESC/firecrown
