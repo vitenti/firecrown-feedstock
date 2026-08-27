@@ -119,7 +119,11 @@ outputs:
         - dependencies-validated.yaml
         - .github/scripts/sync_deps.py
       commands:
-        - python .github/scripts/sync_deps.py --check-installed firecrown-deps
+      # Re-enable at the next release.  The 1.16.0 sdist ships a
+      # --check-installed that compares conda-build's own python and
+      # python_abi requirements against the manifest and so always reports a
+      # difference; the fix landed after 1.16.0 was tagged.
+        # - python .github/scripts/sync_deps.py --check-installed firecrown-deps
         # BEGIN GENERATED firecrown-deps-imports (firecrown 1.16.0)
         - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
         # END GENERATED firecrown-deps-imports
@@ -179,7 +183,11 @@ outputs:
         - dependencies-validated.yaml
         - .github/scripts/sync_deps.py
       commands:
-        - python .github/scripts/sync_deps.py --check-installed firecrown-deps-validated
+      # Re-enable at the next release.  The 1.16.0 sdist ships a
+      # --check-installed that compares conda-build's own python and
+      # python_abi requirements against the manifest and so always reports a
+      # difference; the fix landed after 1.16.0 was tagged.
+        # - python .github/scripts/sync_deps.py --check-installed firecrown-deps-validated
         # BEGIN GENERATED firecrown-deps-imports (firecrown 1.16.0)
         - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
         # END GENERATED firecrown-deps-imports
