@@ -38,26 +38,10 @@ source:
 build:
   number: 0
 
-# No top-level requirements and no skip.  Both existed to shape a CI matrix
-# this recipe no longer wants: every output is noarch, so conda-smithy should
-# render a single configuration.  The python floor that `skip` used to enforce
-# is carried by `python >={{ python_min }}` in the run requirements, which is
-# how a noarch package states it.
-
 outputs:
   - name: firecrown
     build:
-      # Pure python: no extensions, and nothing in the package differs between
-      # python versions.  noarch: python keeps python in host, unlike the
-      # metapackages below -- it is what tells conda-build which interpreter to
-      # install against, and the python_min idiom is how conda-forge expresses
-      # the floor.
       noarch: python
-      # $PYTHON is the shell variable conda-build exports into this output's
-      # build environment, not the {{ PYTHON }} jinja variable, which is not
-      # defined for every rendering pass of a split recipe.  Keeping it inline
-      # avoids a build.sh, which conda-build would adopt as the top-level
-      # script and run for every output that names none of its own.
       script: $PYTHON -m pip install . -vv --no-deps --no-build-isolation
     requirements:
       host:
@@ -78,12 +62,6 @@ outputs:
 
   - name: firecrown-deps
     build:
-      # A pure metapackage: no files, no python-version-specific content.  The
-      # host section is deliberately absent -- conda-build silently ignores
-      # `noarch` on an output that has python in host and emits one package per
-      # python version instead (conda/conda-build#5245).  Without it the run
-      # requirements are published verbatim, with no python_abi and no
-      # rewritten python pin.
       noarch: generic
     requirements:
       run:
@@ -123,8 +101,6 @@ outputs:
         - urllib3
         # END GENERATED firecrown-deps
     test:
-      # A recipe left behind by a version bump would otherwise build
-      # green with the previous release's dependencies.
       source_files:
         - dependencies.yaml
         - dependencies-validated.yaml
@@ -143,12 +119,6 @@ outputs:
 
   - name: firecrown-deps-validated
     build:
-      # A pure metapackage: no files, no python-version-specific content.  The
-      # host section is deliberately absent -- conda-build silently ignores
-      # `noarch` on an output that has python in host and emits one package per
-      # python version instead (conda/conda-build#5245).  Without it the run
-      # requirements are published verbatim, with no python_abi and no
-      # rewritten python pin.
       noarch: generic
     requirements:
       run:
@@ -230,12 +200,6 @@ outputs:
 
   - name: firecrown-devenv
     build:
-      # A pure metapackage: no files, no python-version-specific content.  The
-      # host section is deliberately absent -- conda-build silently ignores
-      # `noarch` on an output that has python in host and emits one package per
-      # python version instead (conda/conda-build#5245).  Without it the run
-      # requirements are published verbatim, with no python_abi and no
-      # rewritten python pin.
       noarch: generic
     requirements:
       run:
