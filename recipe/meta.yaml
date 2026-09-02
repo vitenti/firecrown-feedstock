@@ -1,4 +1,5 @@
 {% set version = "1.16.0" %}
+{% set python_min = "3.12" %}
 
 # The requirement lists between BEGIN/END GENERATED markers are written from
 # the dependencies.yaml manifest in the firecrown repository:
@@ -16,6 +17,10 @@
 # firecrown-validated      firecrown together with firecrown-deps-validated
 # firecrown-devenv         the developer environment
 #
+# firecrown is pure python and the other four outputs are metapackages, so
+# every one of them is noarch: one artifact each, valid on every python and
+# platform, and a new python release needs no rebuild here.
+#
 # When a new upstream release breaks an already published firecrown, tighten
 # the bound in the manifest, bump `build.number` below and regenerate.  Because
 # firecrown depends on firecrown-deps by version rather than by build string,
@@ -32,21 +37,22 @@ source:
 
 build:
   number: 0
-  skip: true  # [win or py<312]
 
-# Every output declares its own requirements, but conda-smithy derives the CI
-# matrix from the top-level metadata: without python here, the rerender
-# collapses .ci_support to a single python version.
-requirements:
-  build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-  host:
-    - python
+# No top-level requirements and no skip.  Both existed to shape a CI matrix
+# this recipe no longer wants: every output is noarch, so conda-smithy should
+# render a single configuration.  The python floor that `skip` used to enforce
+# is carried by `python >={{ python_min }}` in the run requirements, which is
+# how a noarch package states it.
 
 outputs:
   - name: firecrown
     build:
+      # Pure python: no extensions, and nothing in the package differs between
+      # python versions.  noarch: python keeps python in host, unlike the
+      # metapackages below -- it is what tells conda-build which interpreter to
+      # install against, and the python_min idiom is how conda-forge expresses
+      # the floor.
+      noarch: python
       # $PYTHON is the shell variable conda-build exports into this output's
       # build environment, not the {{ PYTHON }} jinja variable, which is not
       # defined for every rendering pass of a split recipe.  Keeping it inline
@@ -54,18 +60,17 @@ outputs:
       # script and run for every output that names none of its own.
       script: $PYTHON -m pip install . -vv --no-deps --no-build-isolation
     requirements:
-      build:
-        - python                                 # [build_platform != target_platform]
-        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
       host:
-        - python
+        - python {{ python_min }}.*
         - pip
         - setuptools
         - setuptools-scm
       run:
-        - python
+        - python >={{ python_min }}
         - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
     test:
+      requires:
+        - python {{ python_min }}.*
       imports:
         - firecrown
       commands:
@@ -207,9 +212,12 @@ outputs:
       summary: Runtime dependencies of firecrown, restricted to validated versions
 
   - name: firecrown-validated
+    build:
+      # See firecrown-deps: a pure metapackage, and the host section is left
+      # out on purpose (conda/conda-build#5245).
+      noarch: generic
+      # firecrown is noarch too now, so nothing here is architecture-specific.
     requirements:
-      host:
-        - python
       run:
         - python
         - {{ pin_subpackage('firecrown', max_pin='x.x.x') }}
