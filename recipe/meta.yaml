@@ -72,9 +72,15 @@ outputs:
         - python -c "import firecrown, importlib.metadata as md; assert firecrown.__version__ == '{{ version }}'; assert md.version('firecrown') == '{{ version }}'"
 
   - name: firecrown-deps
+    build:
+      # A pure metapackage: no files, no python-version-specific content.  The
+      # host section is deliberately absent -- conda-build silently ignores
+      # `noarch` on an output that has python in host and emits one package per
+      # python version instead (conda/conda-build#5245).  Without it the run
+      # requirements are published verbatim, with no python_abi and no
+      # rewritten python pin.
+      noarch: generic
     requirements:
-      host:
-        - python
       run:
         # BEGIN GENERATED firecrown-deps (firecrown 1.16.0)
         - python >=3.12
@@ -131,9 +137,15 @@ outputs:
       summary: Runtime dependencies of firecrown
 
   - name: firecrown-deps-validated
+    build:
+      # A pure metapackage: no files, no python-version-specific content.  The
+      # host section is deliberately absent -- conda-build silently ignores
+      # `noarch` on an output that has python in host and emits one package per
+      # python version instead (conda/conda-build#5245).  Without it the run
+      # requirements are published verbatim, with no python_abi and no
+      # rewritten python pin.
+      noarch: generic
     requirements:
-      host:
-        - python
       run:
         - python
         - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
@@ -209,9 +221,15 @@ outputs:
       summary: firecrown, restricted to the dependency versions it was validated against
 
   - name: firecrown-devenv
+    build:
+      # A pure metapackage: no files, no python-version-specific content.  The
+      # host section is deliberately absent -- conda-build silently ignores
+      # `noarch` on an output that has python in host and emits one package per
+      # python version instead (conda/conda-build#5245).  Without it the run
+      # requirements are published verbatim, with no python_abi and no
+      # rewritten python pin.
+      noarch: generic
     requirements:
-      host:
-        - python
       run:
         - python
         - {{ pin_subpackage('firecrown-deps', max_pin='x.x.x') }}
