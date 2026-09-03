@@ -106,11 +106,7 @@ outputs:
         - dependencies-validated.yaml
         - .github/scripts/sync_deps.py
       commands:
-      # Re-enable at the next release.  The 1.16.0 sdist ships a
-      # --check-installed that compares conda-build's own python and
-      # python_abi requirements against the manifest and so always reports a
-      # difference; the fix landed after 1.16.0 was tagged.
-        # - python .github/scripts/sync_deps.py --check-installed firecrown-deps
+        - python .github/scripts/sync_deps.py --check-installed firecrown-deps
         # BEGIN GENERATED firecrown-deps-imports (firecrown 1.16.0)
         - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
         # END GENERATED firecrown-deps-imports
@@ -170,11 +166,7 @@ outputs:
         - dependencies-validated.yaml
         - .github/scripts/sync_deps.py
       commands:
-      # Re-enable at the next release.  The 1.16.0 sdist ships a
-      # --check-installed that compares conda-build's own python and
-      # python_abi requirements against the manifest and so always reports a
-      # difference; the fix landed after 1.16.0 was tagged.
-        # - python .github/scripts/sync_deps.py --check-installed firecrown-deps-validated
+        - python .github/scripts/sync_deps.py --check-installed firecrown-deps-validated
         # BEGIN GENERATED firecrown-deps-imports (firecrown 1.16.0)
         - python -c "import astropy, camb, cosmosis, crow, matplotlib, numcosmo_py, numpy, pyccl, pydantic, rich, sacc, scipy, typer, typing_extensions, yaml"
         # END GENERATED firecrown-deps-imports
@@ -238,6 +230,19 @@ outputs:
         - sphinxcontrib-apidoc
         - types-requests
         # END GENERATED firecrown-devenv
+    test:
+      # Having a test section at all is what makes conda-build solve this
+      # metapackage; without one the output is skipped entirely.  sync_deps.py
+      # knows only the two firecrown-deps outputs, so --check-installed cannot
+      # cover this one and the tools are checked directly instead.
+      commands:
+        - python -c "import hypothesis, pandas, plotnine, requests"
+        - pytest --version
+        - mypy --version
+        - black --version
+        - flake8 --version
+        - pylint --version
+        - sphinx-build --version
     about:
       summary: Everything needed to develop, test and document firecrown
 
